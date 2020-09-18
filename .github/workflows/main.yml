@@ -17,21 +17,34 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-      -
-         name: Generate Dockerfile
-         run: |
-          python3 scripts/dev/dockerfile_generator.py operator > Dockerfile
-      -
+      - 
         name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push
+         name: Generate Dockerfile Operator
+         run: |
+          python3 scripts/dev/dockerfile_generator.py operator > Dockerfile
+
+      -
+        name: Build and push operator
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: bznein/foo:latest
+          tags: bznein/operator:latest
+      -
+         name: Generate Dockerfile hook
+         run: |
+          python3 scripts/dev/dockerfile_generator.py versionhook > Dockerfile
+      -
+        name: Build and push hook
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: bznein/versionhook:latest
